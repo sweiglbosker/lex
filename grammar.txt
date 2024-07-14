@@ -1,0 +1,13 @@
+re = cat re'
+
+re' = '|' cat
+      | ε
+
+cat = e cat'
+
+cat' = e cat'
+	| ε
+
+e = l+ | l? | l* | l
+
+l = literal | characterclass | period | (re)

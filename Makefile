@@ -1,5 +1,5 @@
 TARGET=lex
-SRC=fsm.c dfa.c nfa.c main.c regex.c
+SRC=fsm.c dfa.c nfa.c main.c regex.c parser.c
 OBJ=$(SRC:.c=.o)
 HEADERS = $(wildcard *.h)
 CFLAGS := -Wall -Wshadow -g -march=native -std=c11 -pipe

@@ -20,6 +20,7 @@ typedef enum {
 	TOKEN_UNION,
 	TOKEN_STAR,
 	TOKEN_PERIOD,
+	TOKEN_QUESTION,
 } RegexTokenKind;
 
 typedef struct {
@@ -47,8 +48,7 @@ RegexScanner *regex_scanner_new(char *str);
 RegexToken *regex_scanner_advance(RegexScanner *r);
 RegexTokenList *regex_scanner_scan(RegexScanner *r);
 
-NFA *regex_to_nfa(RegexTokenList *tl);
-
+void regextoken_print(RegexToken *t);
 void regex_token_list_print(RegexTokenList *tl);
 
 #endif /* _REGEX_H */

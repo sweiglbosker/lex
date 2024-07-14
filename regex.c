@@ -5,8 +5,6 @@
 
 #include "regex.h"
 
-static void characterclass_print(CharacterClass *cc);
-static void token_print(RegexToken *t);
 
 static const char *REGEX_TOKEN_NAME[] = {
 	[TOKEN_END] = "END",
@@ -17,8 +15,11 @@ static const char *REGEX_TOKEN_NAME[] = {
 	[TOKEN_PLUS] = "PLUS",
 	[TOKEN_UNION] = "UNION",
 	[TOKEN_STAR] = "*",
-	[TOKEN_PERIOD] = "."
+	[TOKEN_PERIOD] = ".",
+	[TOKEN_QUESTION] = "?"
 };
+
+static void characterclass_print(CharacterClass *cc);
 
 static int escaped_char(int c) {
 	switch (c) {
@@ -149,6 +150,9 @@ RegexToken *regex_scanner_advance(RegexScanner *r) {
 	case '.':
 		t->kind = TOKEN_PERIOD;
 		break;
+	case '?':
+		t->kind = TOKEN_QUESTION;
+		break;
 	case '[':
 		t->kind = TOKEN_CHARACTERCLASS;
 		t->cc = scan_cc(r);
@@ -172,11 +176,17 @@ RegexToken *regex_scanner_advance(RegexScanner *r) {
 RegexTokenList *regex_scanner_scan(RegexScanner *r) {
 	RegexTokenList *head = calloc(1, sizeof(RegexTokenList));
 	RegexTokenList *tail = head;
+	RegexTokenList *prev = NULL;
 
 
 	while (true) {
 		tail->t = regex_scanner_advance(r);
 
+		if (tail->t == NULL && prev) {
+			free(tail);
+			prev->next = NULL;
+			break;
+		}
 		if (tail->t == TOKEN_END) {
 			tail->next = NULL;
 			break;
@@ -184,6 +194,7 @@ RegexTokenList *regex_scanner_scan(RegexScanner *r) {
 		
 
 		tail->next = calloc(1, sizeof(RegexTokenList));
+		prev = tail;
 		tail = tail->next;
 	}
 
@@ -205,7 +216,7 @@ static void characterclass_print(CharacterClass *cc) {
 	}
 }
 
-static void token_print(RegexToken *t) {
+void regextoken_print(RegexToken *t) {
 	switch (t->kind) {
 	case TOKEN_LITERAL:
 		printf("kind: LITERAL, val: %c\n", t->val);
@@ -221,7 +232,7 @@ static void token_print(RegexToken *t) {
 
 void regex_token_list_print(RegexTokenList *tl) {
 	while (tl->next) {
-		token_print(tl->t);
+		regextoken_print(tl->t);
 		tl = tl->next;
 	}
 }
